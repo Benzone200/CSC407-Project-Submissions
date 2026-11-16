@@ -15,7 +15,7 @@ Open http://127.0.0.1:5000. Staff who register get the `user` role; admins promo
 python -m pytest -v
 ```
 
-## Test plan (for your report)
+## Test plan
 | Area | How it is covered |
 |---|---|
 | Functional | `test_register_login_logout`, `test_create_and_filter_patients`, `test_edit_persists` |
