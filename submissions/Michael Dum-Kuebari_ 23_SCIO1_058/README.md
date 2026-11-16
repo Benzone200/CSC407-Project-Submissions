@@ -28,9 +28,6 @@ The SQLite database is created and seeded automatically on first run into `insta
 | Attendee | `ada@example.com`   | `Demo@2026!`  |
 | Attendee | `chidi@example.com` | `Demo@2026!`  |
 
-> These are **demo credentials for local grading/marking**. In any real deployment, create your own
-> admin account and remove the seeds.
-
 ### Configuration (environment variables)
 
 | Variable        | Default                  | Purpose |
