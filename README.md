@@ -1,109 +1,70 @@
-# CSC 407 Project Submission Guide
+# Mah's Estates — Apartment Management
 
-Submit your project as a **zip file** through the GitHub website. No git, no command line, no tokens needed.
+A Next.js App Router application for property managers, maintenance staff and tenants. The deployed website contains **no seeded tenants, property records, leases, payments, maintenance tickets, notices or visitors**. All workspace records are loaded from the application's Postgres database.
 
-Repository: https://github.com/CSC-407/class-project
+## Live account flow
 
-> **Do NOT clone this repo or try to push to it directly. You do not have permission. Always fork first.**
+1. A tenant registers with their name, email, password and optional emergency contact.
+2. The server validates the submitted fields, hashes the password with bcrypt (cost 12), creates a TENANT account and starts a secure database-backed session.
+3. The new tenant immediately appears in the manager's tenant directory. No lease is required to appear in that list. The newest registrations appear first, and open workspaces refresh on focus and every 30 seconds.
+4. The tenant initially sees an unassigned unit and no rent schedule. A manager creates the property's real units and assigns a lease. Registration never creates a fictional property, occupied unit, balance or payment.
+5. Rent schedules, receipts, requests, notices and visitor entries appear as the corresponding authorized activities are recorded.
 
----
+There is no role switcher or public manager account. Legacy `/demo/*` links redirect to sign-in. The app removes obsolete browser-local demonstration records when a page loads. Existing authentication cookie identifiers remain stable.
 
-## Before you start
+## Stack
 
-1. Have a GitHub account and be logged in at github.com (use a browser, not the mobile app. On a phone, switch to "Desktop site").
-2. Zip your project:
-   - **Delete `node_modules`, `vendor`, `venv`, `.env`, and any passwords or API keys** from the project folder first.
-   - Right-click the project folder and choose **Compress / Send to > Compressed (zipped) folder**.
-   - Name it `ProjectName.zip`.
-   - The zip must be **under 25 MB**. If it is bigger, you removed too little (usually `node_modules`).
-3. Include a `README.md` inside your project that explains what it does and how to run it.
+Next.js 16, React 19, TypeScript, Tailwind CSS 4, Supabase Postgres with the pg server driver, Drizzle ORM, Zod 4, bcryptjs, Vitest and Playwright. Node 24 LTS. Resolved dependencies are pinned in `package-lock.json`.
 
----
+## Database and initial setup
 
-## Step 1: Fork the repository
+A dedicated Supabase database must be connected to Vercel project `haven-university-apartments` before real account creation can work. The product name is Mah's Estates; the existing project identifier and domain are retained.
 
-1. Open https://github.com/CSC-407/class-project
-2. Click **Fork** (top right).
-3. Owner: your own account. Click **Create fork**.
-4. You are now on *your* copy: the URL should contain **your username**.
+1. Provision a dedicated Supabase project through the connected Supabase integration. Connect it to this Vercel project; do not reuse another application's database.
+2. Set server-only `DATABASE_URL` to the Supabase server-side Postgres pooler connection string, using the project's privileged database role, never an anon/publishable key. Set `APP_ORIGIN` to the exact site origin. The current production origin is `https://haven-university-apartments.vercel.app`.
+3. Use `vercel env pull .env.local` to securely obtain local variables for the linked project, or supply them through the execution environment. Never commit secrets.
+4. Run `npm ci`, then `npm run db:migrate` to apply the committed migration. Builds do not migrate or seed databases.
+5. Supply `ADMIN_EMAIL` and a unique strong `ADMIN_PASSWORD` through the trusted local environment and run `npm run db:seed`. This creates an administrator only; it never adds tenant or transaction fixtures and never promotes an existing account. Optional `STAFF_EMAIL` and `STAFF_PASSWORD` create staff. Remove bootstrap credentials after use.
+6. Deploy or redeploy the reviewed source after setting environment variables. Use `npm run dev` locally after project linking and environment setup.
 
-## Step 2: Create your folder
+There are no default administrator credentials. Public registration always creates a TENANT. A missing or unmigrated database makes account services unavailable; the app does not fall back to local browser accounts or invented records. `/api/health` returns 200 only if account storage can be queried; otherwise it returns 503.
 
-1. In your fork, open the `submissions` folder.
-2. Click **Add file > Create new file**.
-3. In the file name box, type exactly:
+## Routes
 
-   ```
-   FULLNAME_MATRICNUMBER/README.md
-   ```
+- Public: `/`, `/home`, `/login`, `/register`, `/security`.
+- Signed-in accounts: `/dashboard`, `/profile`, `/properties`, `/units`, `/leases`, `/payments`, `/maintenance`, `/notices`, `/visitors`.
+- Manager-only directory and administration: `/tenants`, `/admin`.
+- Manager-only university project documentation: `/testing`, `/review`.
+- Legacy `/demo/*`: redirects to sign-in; no demonstration workspace remains.
 
-   Example: `BENJAMIN_DUNU_23SCXXXX/README.md`
+## Operational behavior
 
-   Typing the `/` is what creates the folder.
-4. In the content area, write your name, matric number, and project title.
-5. Click **Commit changes**, then **Commit changes** again.
+Properties and units support descriptions, HTTPS photo URLs, floor/type/rent/status filters and pagination. Units become occupied through lease assignment. The tenant directory includes registered tenants before lease assignment. A move-out closes the lease and vacates the unit.
 
-## Step 3: Upload your zip
+Manual payment records use unique references and integer USD amounts. Rent is due on the first of the month, or the first lease start date for the initial month. Partial payments reduce balances. Receipts are ownership-scoped downloads. No card details or payment gateway are used.
 
-1. Open your new `FULLNAME_MATRICNUMBER` folder in your fork.
-2. Click **Add file > Upload files**.
-3. Drag in your `.zip` file and wait for it to finish uploading.
-4. Commit message: `Add [Your Name] project submission`.
-5. Click **Commit changes**.
+Tenants submit maintenance requests and comments, read relevant notices, and pre-register visitors. Staff manage requests and visitor transitions. All mutations validate role and ownership on the server.
 
-Check that the zip now appears inside your folder.
+List APIs paginate at 10 rows. Manager select controls are bounded to 200 eligible options. Dashboard and property counts query real database aggregates; they do not infer totals from the first page. The rent chart shows the selected month's actual records, with no invented historical series. Larger operations should replace bounded selectors with searchable autocomplete.
 
-## Step 4: Open the Pull Request
+## Security and verification
 
-1. Go back to the main page of your fork.
-2. Click **Contribute > Open pull request** (or the yellow **Compare & pull request** button).
-3. Confirm at the top:
-   - **base repository:** `CSC-407/class-project`, branch `main`
-   - **head repository:** your fork
-4. **Title** (use this format):
+Security controls include bcrypt12, high-entropy hashed session tokens, HttpOnly/Secure/SameSite host-only production cookies, strict Zod schemas, server-side role and ownership checks, parameterized Drizzle queries, configured-origin checks, bounded JSON bodies, shared Postgres rate limits, nonce CSP, security headers and transactional audit writes.
 
-   ```
-   [SUBMISSION] Full Name - Matric Number - Project Name
-   ```
+```sh
+npm run typecheck
+npm test
+npm run build
+npm run test:e2e
+npm audit --omit=dev --audit-level=moderate
+```
 
-   Example: `[SUBMISSION] Benjamin Dunu - 23SCXXXX - School Fees Management System`
-5. **Description**, copy and fill in:
+Vitest exercises validation, request boundaries, role policies, tenant ownership SQL and registration persistence at a mocked database boundary. Playwright verifies the public website, absence of sample records, obsolete-route redirects, authentication gates, browser cleanup, responsive layouts and security headers. Mocked tests are not evidence of a successful Supabase connection. Production Supabase connectivity and ordinary-tenant authentication were verified; see `docs/VERIFICATION.md` for evidence and remaining privileged checks.
 
-   ```
-   Full name:
-   Matric number:
-   GitHub username:
-   Project title:
-   Brief description of what the system does:
-   How to run the project (dependencies/setup):
-   Known limitations or incomplete features:
-   ```
-6. Click **Create pull request**.
-7. Copy the link of your PR. This is your proof of submission.
+## Production review
 
----
+See `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/REVIEW.md` and `docs/VERIFICATION.md`. Email verification, password recovery, MFA, monitoring/alerts, backup restoration, retention automation and an independent security/accessibility review remain operational release requirements. Removing demonstration data does not certify these requirements or make an unconnected database operational.
 
-## Checklist
+## Supabase table security
 
-- [ ] I forked the repo (I did not clone or push to the original)
-- [ ] My folder is `submissions/FULLNAME_MATRICNUMBER/`
-- [ ] My zip is inside my folder and under 25 MB
-- [ ] No `node_modules`, `.env`, passwords or API keys in the zip
-- [ ] My project has a README explaining how to run it
-- [ ] The PR base is `CSC-407/class-project`, not my fork
-- [ ] My PR title and description are complete
-- [ ] I copied my PR link
-
-## Common problems
-
-| Problem | Fix |
-|---|---|
-| I can't find a "New folder" button | There isn't one. Create a file named `FOLDER/README.md` (Step 2). |
-| I can't see the `submissions` folder in my fork | On your fork's page click **Sync fork > Update branch**. |
-| Upload fails or hangs | Zip is too big. Remove `node_modules` and re-zip (limit 25 MB). |
-| I can't find where to open the PR | Go to your fork's main page and click **Contribute > Open pull request**. |
-| "No changes to compare" | Your upload was not committed. Redo Step 3 and click Commit. |
-| The PR shows my own fork as base | Change base repository to `CSC-407/class-project`. |
-| I accidentally changed someone else's files | Do not submit. Delete your fork and start again. |
-
-Rules: submit only your own work, do not edit or delete anyone else's folder.
+The committed second migration enables row-level security on every application table and revokes direct table access from PUBLIC, anon and authenticated. No browser Supabase SDK or public key is used: account and tenant data travel through the existing session-checked Next.js API. Apply both migrations before enabling registration. The server connection must own the application tables (the Supabase project postgres role is suitable) or otherwise have the explicitly required server privileges. Keep that credential server-only. See docs/SUPABASE_SETUP.md.
