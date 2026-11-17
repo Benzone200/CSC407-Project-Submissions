@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-11-17T10:04:21.824Z",
+  "passed": 63,
+  "failed": 0,
+  "total": 63,
+  "results": [
+    {
+      "name": "GET /api/health returns ok",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/products lists seeded products",
+      "status": "PASS"
+    },
+    {
+      "name": "Search filters products by keyword",
+      "status": "PASS"
+    },
+    {
+      "name": "Category filter works",
+      "status": "PASS"
+    },
+    {
+      "name": "Price range filter works",
+      "status": "PASS"
+    },
+    {
+      "name": "Sorting by price ascending works",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/products/:id returns a single product",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/products/:id with unknown id returns 404",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/products/:id with non-numeric id returns 400",
+      "status": "PASS"
+    },
+    {
+      "name": "Register a new user succeeds (201) and returns no password data",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate email registration returns 409",
+      "status": "PASS"
+    },
+    {
+      "name": "Login with wrong password returns 401 (generic message)",
+      "status": "PASS"
+    },
+    {
+      "name": "Login with unknown email returns the same generic 401",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/auth/me returns the logged-in user",
+      "status": "PASS"
+    },
+    {
+      "name": "GET /api/auth/me without a session returns 401",
+      "status": "PASS"
+    },
+    {
+      "name": "Seeded admin can log in and has role admin",
+      "status": "PASS"
+    },
+    {
+      "name": "Second user registers for access-control tests",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: invalid email format",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: password too short",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: password without a number",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: password without a letter",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: missing name",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: name too short",
+      "status": "PASS"
+    },
+    {
+      "name": "Registration rejected: oversized name",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin product creation rejects negative price",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin product creation rejects missing name",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin product creation rejects non-http image URL",
+      "status": "PASS"
+    },
+    {
+      "name": "SQL injection in login is neutralized (401, no bypass)",
+      "status": "PASS"
+    },
+    {
+      "name": "SQL injection in search does not damage the database",
+      "status": "PASS"
+    },
+    {
+      "name": "SQL injection in registration is stored as inert data",
+      "status": "PASS"
+    },
+    {
+      "name": "XSS payload in product name is stored but output-encoded by the client",
+      "status": "PASS"
+    },
+    {
+      "name": "State-changing request without CSRF token returns 403",
+      "status": "PASS"
+    },
+    {
+      "name": "State-changing request with wrong CSRF token returns 403",
+      "status": "PASS"
+    },
+    {
+      "name": "Unauthenticated access to admin endpoints returns 401",
+      "status": "PASS"
+    },
+    {
+      "name": "Non-admin user accessing admin endpoints returns 403",
+      "status": "PASS"
+    },
+    {
+      "name": "Session cookie is HttpOnly",
+      "status": "PASS"
+    },
+    {
+      "name": "Security headers are present (CSP, nosniff, frame protection, HSTS)",
+      "status": "PASS"
+    },
+    {
+      "name": "Checkout creates an order and decrements stock",
+      "status": "PASS"
+    },
+    {
+      "name": "Checkout with empty cart returns 400",
+      "status": "PASS"
+    },
+    {
+      "name": "Checkout beyond available stock returns 400",
+      "status": "PASS"
+    },
+    {
+      "name": "Unauthenticated checkout returns 401",
+      "status": "PASS"
+    },
+    {
+      "name": "Users only see their own orders (access control)",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin can list all orders and update status",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin order status update rejects invalid status",
+      "status": "PASS"
+    },
+    {
+      "name": "Profile update works",
+      "status": "PASS"
+    },
+    {
+      "name": "Change password rejects wrong current password",
+      "status": "PASS"
+    },
+    {
+      "name": "Change password works and new password can log in",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin can create, update and delete a product",
+      "status": "PASS"
+    },
+    {
+      "name": "Deleting a product that appears in orders is blocked (409)",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin can promote a user to admin and demote back",
+      "status": "PASS"
+    },
+    {
+      "name": "Admin cannot change their own role or delete themselves",
+      "status": "PASS"
+    },
+    {
+      "name": "Logout invalidates the session",
+      "status": "PASS"
+    },
+    {
+      "name": "Malformed JSON body returns 400 (not a crash)",
+      "status": "PASS"
+    },
+    {
+      "name": "Unknown API route returns JSON 404",
+      "status": "PASS"
+    },
+    {
+      "name": "Oversized payload returns 413",
+      "status": "PASS"
+    },
+    {
+      "name": "Rate limiting kicks in after repeated failed logins (429)",
+      "status": "PASS"
+    },
+    {
+      "name": "Passwords are stored as bcrypt hashes, never plaintext",
+      "status": "PASS"
+    },
+    {
+      "name": "Seeded admin exists with role admin",
+      "status": "PASS"
+    },
+    {
+      "name": "Foreign keys are enforced",
+      "status": "PASS"
+    },
+    {
+      "name": "Sessions are stored server-side in the database",
+      "status": "PASS"
+    },
+    {
+      "name": "HTML includes a viewport meta tag for mobile",
+      "status": "PASS"
+    },
+    {
+      "name": "CSS contains responsive breakpoints",
+      "status": "PASS"
+    },
+    {
+      "name": "Frontend uses textContent/escaping for user data (XSS-safe rendering)",
+      "status": "PASS"
+    }
+  ]
+}
